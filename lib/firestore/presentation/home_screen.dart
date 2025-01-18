@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:matc89_aplicativo_receitas/firestore_produtos/presentation/avaliacao_screen.dart';
 import 'package:uuid/uuid.dart';
 import '../models/receita.dart';
 
@@ -63,7 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       child: ListTile(
                         onTap: () {
-                          print("clicou");
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => AvaliacaoScreen(listin: model)));
                         },
                         onLongPress: () {
                           showFormModal(model: model);
