@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:matc89_aplicativo_receitas/controllers/receita_controller.dart';
 import 'package:matc89_aplicativo_receitas/presentation/avaliacao_screen.dart';
-import 'package:matc89_aplicativo_receitas/repositories/receita_repository.dart';
 import 'package:uuid/uuid.dart';
 import '../models/receita.dart';
 
@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Receita> listaReceitas = [];
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  ReceitaRepository receitaRepository = new ReceitaRepository();
+  ReceitaController receitaController = ReceitaController();
 
   @override
   void initState() {
@@ -62,7 +62,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         alignment: Alignment.centerRight,
                       ),
                       onDismissed: (direction) {
-                        remove(model);
+                        receitaController.delete(model.id);
+                        refresh();
                       },
                       child: ListTile(
                         onTap: () {
@@ -168,8 +169,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (model != null) {
                           id = model.id;
                         }
-                        createOrUpdate(nameController.text, descriptionController.text, ingredientsController.text, preparationController.text, id);
-                        //refresh();
+                        receitaController.createOrUpdate(nameController.text, descriptionController.text, ingredientsController.text, preparationController.text, id);
+                        refresh();
                         Navigator.pop(context);
                       },
                       child: Text(confirmationButton)),
@@ -182,18 +183,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void createOrUpdate(String name, String description, String ingredients, String preparation, String id) async {
-    receitaRepository.createOrUpdate(id, name, description, ingredients, preparation);
-    refresh();
-  }
-
-  void remove(Receita model) async {
-    await receitaRepository.delete(model.id);
-    refresh();
-  }
 
   refresh() async {
-    final receitas = await receitaRepository.getAll();
+    final receitas = await receitaController.getAll();
     setState(() {
       listaReceitas = receitas;
     });

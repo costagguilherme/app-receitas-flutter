@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:matc89_aplicativo_receitas/repositories/avaliacao_repository.dart';
+import 'package:matc89_aplicativo_receitas/controllers/avaliacao_controller.dart';
 import 'package:uuid/uuid.dart';
 import '../models/receita.dart';
 import '../models/avaliacao.dart';
@@ -17,7 +17,7 @@ class AvaliacaoScreen extends StatefulWidget {
 class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
   List<Avaliacao> listaAvaliacoes = [];
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  AvaliacaoRepository avaliacaoRepository = new AvaliacaoRepository();
+  AvaliacaoController avaliacaoController = new AvaliacaoController();
 
   @override
   void initState() {
@@ -27,15 +27,7 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double soma = 0;
-    for (Avaliacao avaliacao in this.listaAvaliacoes) {
-      soma = soma + avaliacao.score;
-    }
-
-    double averageScore = 10;
-    if (this.listaAvaliacoes.length > 0) {
-      averageScore = soma / this.listaAvaliacoes.length;
-    }
+    double averageScore = avaliacaoController.getAverageScore(this.listaAvaliacoes);
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.recipe.name)),
@@ -91,7 +83,8 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
                     alignment: Alignment.centerRight,
                   ),
                   onDismissed: (direction) {
-                    remove(avaliacao);
+                    avaliacaoController.delete(avaliacao.id, widget.recipe.id);
+                    refresh();
                   },
                   child: ListTileAvaliacao(
                     avaliacao: avaliacao,
@@ -237,7 +230,7 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
                         id = model.id;
                       }
 
-                      createOrUpdate(id, commentController.text, scoreController.text);
+                      avaliacaoController.createOrUpdate(id, widget.recipe.id, commentController.text, scoreController.text);
                       refresh();
                       Navigator.pop(context);
                     },
@@ -252,16 +245,8 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
     );
   }
 
-  void createOrUpdate(String id, String comment, String score) async  {
-    avaliacaoRepository.createOrUpdate(id, widget.recipe.id, comment, score);
-  }
-  void remove(Avaliacao model) async {
-    await avaliacaoRepository.delete(model.id, widget.recipe.id);
-    refresh();
-  }
-
   refresh() async {
-    final avalicacoes = await avaliacaoRepository.getAll(widget.recipe.id);
+    final avalicacoes = await avaliacaoController.getAll(widget.recipe.id);
     setState(() {
       listaAvaliacoes = avalicacoes;
     });
