@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:matc89_aplicativo_receitas/firestore/presentation/home_screen.dart';
+import 'package:matc89_aplicativo_receitas/presentation/home_screen.dart';
 import 'firebase_options.dart';
 
 void main() async {

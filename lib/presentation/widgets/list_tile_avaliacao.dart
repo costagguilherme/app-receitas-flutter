@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../model/avaliacao.dart';
+import '../../../models/avaliacao.dart';
 
 class ListTileAvaliacao extends StatelessWidget {
   final Avaliacao avaliacao;

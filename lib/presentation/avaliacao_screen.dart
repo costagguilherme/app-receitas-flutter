@@ -1,13 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:matc89_aplicativo_receitas/repositories/avaliacao_repository.dart';
 import 'package:uuid/uuid.dart';
-import '../../firestore/models/receita.dart';
-import '../model/avaliacao.dart';
-import 'widgets/list_tile_avaliacao.dart';
+import '../models/receita.dart';
+import '../models/avaliacao.dart';
+import '../presentation/widgets/list_tile_avaliacao.dart';
 
 class AvaliacaoScreen extends StatefulWidget {
-  final Receita listin;
-  const AvaliacaoScreen({super.key, required this.listin});
+  final Receita recipe;
+  const AvaliacaoScreen({super.key, required this.recipe});
 
   @override
   State<AvaliacaoScreen> createState() => _AvaliacaoScreenState();
@@ -16,6 +17,7 @@ class AvaliacaoScreen extends StatefulWidget {
 class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
   List<Avaliacao> listaAvaliacoes = [];
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  AvaliacaoRepository avaliacaoRepository = new AvaliacaoRepository();
 
   @override
   void initState() {
@@ -36,7 +38,7 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(widget.listin.name)),
+      appBar: AppBar(title: Text(widget.recipe.name)),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showFormModal();
@@ -114,7 +116,7 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                widget.listin.ingredients,  // Exibindo a string dos ingredientes
+                widget.recipe.ingredients,  // Exibindo a string dos ingredientes
                 style: const TextStyle(fontSize: 16),
                 textAlign: TextAlign.left,  // Para alinhamento à esquerda
               ),
@@ -134,7 +136,7 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
-                widget.listin.preparation,  // Exibindo a string dos ingredientes
+                widget.recipe.preparation,  // Exibindo a string dos ingredientes
                 style: const TextStyle(fontSize: 16),
                 textAlign: TextAlign.left,  // Para alinhamento à esquerda
               ),
@@ -230,28 +232,13 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      // Criar um objeto Avaliacao com as infos
-                      Avaliacao avaliacao = Avaliacao(
-                          id: const Uuid().v1(),
-                          comment: commentController.text,
-                          score: double.parse(scoreController.text));
-
-                      // Caso edição, usar o id da avaliação em questão
+                      var id = const Uuid().v1();
                       if (model != null) {
-                        avaliacao.id = model.id;
+                        id = model.id;
                       }
 
-                      // Grava no Firestore
-                      firestore
-                          .collection("receitas")
-                          .doc(widget.listin.id)
-                          .collection("avaliacoes")
-                          .doc(avaliacao.id)
-                          .set(avaliacao.toMap());
-                      // Atualizar a lista
+                      createOrUpdate(id, commentController.text, scoreController.text);
                       refresh();
-
-                      // Fechar o Modal
                       Navigator.pop(context);
                     },
                     child: Text(labelConfirmationButton),
@@ -265,30 +252,20 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
     );
   }
 
+  void createOrUpdate(String id, String comment, String score) async  {
+    avaliacaoRepository.createOrUpdate(id, widget.recipe.id, comment, score);
+  }
   void remove(Avaliacao model) async {
-    await firestore
-        .collection("receitas")
-        .doc(widget.listin.id)
-        .collection("avaliacoes")
-        .doc(model.id)
-        .delete();
+    await avaliacaoRepository.delete(model.id, widget.recipe.id);
     refresh();
   }
 
   refresh() async {
-    List<Avaliacao> temp = [];
-    QuerySnapshot<Map<String, dynamic>> snapshot = await firestore
-        .collection("receitas")
-        .doc(widget.listin.id)
-        .collection("avaliacoes")
-        .get();
-    for (var doc in snapshot.docs) {
-      Avaliacao avaliacao = Avaliacao.fromMap(doc.data());
-      temp.add(avaliacao);
-    }
-
+    final avalicacoes = await avaliacaoRepository.getAll(widget.recipe.id);
     setState(() {
-      listaAvaliacoes = temp;
+      listaAvaliacoes = avalicacoes;
     });
   }
 }
+
+

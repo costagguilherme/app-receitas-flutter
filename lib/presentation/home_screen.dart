@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:matc89_aplicativo_receitas/firestore_produtos/presentation/avaliacao_screen.dart';
+import 'package:matc89_aplicativo_receitas/presentation/avaliacao_screen.dart';
+import 'package:matc89_aplicativo_receitas/repositories/receita_repository.dart';
 import 'package:uuid/uuid.dart';
 import '../models/receita.dart';
 
@@ -14,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   List<Receita> listaReceitas = [];
   FirebaseFirestore firestore = FirebaseFirestore.instance;
+  ReceitaRepository receitaRepository = new ReceitaRepository();
 
   @override
   void initState() {
@@ -64,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                       child: ListTile(
                         onTap: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => AvaliacaoScreen(listin: model)));
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => AvaliacaoScreen(recipe: model)));
                         },
                         onLongPress: () {
                           showFormModal(model: model);
@@ -162,21 +164,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   ElevatedButton(
                       onPressed: () {
-                        Receita receita = Receita(
-                            id: const Uuid().v1(),
-                            name: nameController.text,
-                            description: descriptionController.text,
-                            ingredients: ingredientsController.text,
-                            preparation: preparationController.text);
+                        var id = const Uuid().v1();
                         if (model != null) {
-                          receita.id = model.id;
+                          id = model.id;
                         }
-                        firestore
-                            .collection("receitas")
-                            .doc(receita.id)
-                            .set(receita.toMap());
-
-                        refresh();
+                        createOrUpdate(nameController.text, descriptionController.text, ingredientsController.text, preparationController.text, id);
+                        //refresh();
                         Navigator.pop(context);
                       },
                       child: Text(confirmationButton)),
@@ -189,21 +182,20 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void createOrUpdate(String name, String description, String ingredients, String preparation, String id) async {
+    receitaRepository.createOrUpdate(id, name, description, ingredients, preparation);
+    refresh();
+  }
+
   void remove(Receita model) async {
-    await firestore.collection("receitas").doc(model.id).delete();
+    await receitaRepository.delete(model.id);
     refresh();
   }
 
   refresh() async {
-    List<Receita> temp = [];
-    QuerySnapshot<Map<String, dynamic>> snapshot =
-        await firestore.collection("receitas").get();
-    for (var doc in snapshot.docs) {
-      temp.add(Receita.fromMap(doc.data()));
-    }
-
+    final receitas = await receitaRepository.getAll();
     setState(() {
-      listaReceitas = temp;
+      listaReceitas = receitas;
     });
   }
 }
