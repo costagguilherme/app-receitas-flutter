@@ -4,15 +4,17 @@ class Receita {
   String description;
   String ingredients;
   String preparation;
+  bool favorite;
 
-  Receita({required this.id, required this.name, required this.description, required this.ingredients, required this.preparation});
+  Receita({required this.id, required this.name, required this.description, required this.ingredients, required this.preparation, this.favorite = false});
 
   Receita.fromMap(Map<String, dynamic> map)
       : id = map["id"],
         name = map["name"],
         description = map["description"],
         ingredients = map["ingredients"],
-        preparation = map["preparation"]
+        preparation = map["preparation"],
+        favorite = map["favorite"] ?? false
     ;
 
   Map<String, dynamic> toMap() {
@@ -21,7 +23,8 @@ class Receita {
       "name": name,
       "description": description,
       "ingredients": ingredients,
-      "preparation": preparation
+      "preparation": preparation,
+      "favorite": favorite
     };
   }
 }

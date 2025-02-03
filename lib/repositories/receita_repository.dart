@@ -17,13 +17,26 @@ class ReceitaRepository {
     return receitas;
   }
 
-  createOrUpdate(String id, String name, String description, String ingredients, String prepration) async {
+  Future<List<Receita>> getFavorites() async {
+    List<Receita> receitasFavoritas = [];
+    QuerySnapshot<Map<String, dynamic>> snapshot = await firestore.collection("receitas").where("favorite", isEqualTo: true).get();
+    for (var doc in snapshot.docs) {
+      receitasFavoritas.add(Receita.fromMap(doc.data()));
+    }
+
+    return receitasFavoritas;
+  }
+
+  createOrUpdate(String id, String name, String description, String ingredients, String prepration, bool favorite) async {
     Receita receita = Receita(
         id: id,
         name: name,
         description: description,
         ingredients: ingredients,
-        preparation: prepration);
+        preparation: prepration,
+      favorite: favorite
+
+    );
 
     firestore
         .collection("receitas")

@@ -9,8 +9,12 @@ class ReceitaController {
     return await receitaRepository.getAll();
   }
 
-  Future<void> createOrUpdate(String nome, String descricao, String ingredientes, String preparo, String id) async {
-    await receitaRepository.createOrUpdate(id, nome, descricao, ingredientes, preparo);
+  Future<List<Receita>> getFavorites() async {
+    return await receitaRepository.getFavorites();
+  }
+
+  Future<void> createOrUpdate(String nome, String descricao, String ingredientes, String preparo, String id, bool favorite) async {
+    await receitaRepository.createOrUpdate(id, nome, descricao, ingredientes, preparo, favorite);
   }
 
   Future<void> delete(String id) async {

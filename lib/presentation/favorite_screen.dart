@@ -2,19 +2,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:matc89_aplicativo_receitas/controllers/receita_controller.dart';
 import 'package:matc89_aplicativo_receitas/presentation/avaliacao_screen.dart';
-import 'package:matc89_aplicativo_receitas/presentation/favorite_screen.dart';
+import 'package:matc89_aplicativo_receitas/presentation/home_screen.dart';
 import 'package:matc89_aplicativo_receitas/presentation/widgets/card_receita.dart';
-import 'package:uuid/uuid.dart';
 import '../models/receita.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class FavoriteScreen extends StatefulWidget {
+  const FavoriteScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<FavoriteScreen> createState() => _FavoriteScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _FavoriteScreenState extends State<FavoriteScreen> {
   List<Receita> listaReceitas = [];
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   ReceitaController receitaController = ReceitaController();
@@ -32,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Row(
           children: [
             Text(
-              "Livro de Receitas.",
+              "Receitas Favoritas",
               style: TextStyle(
                 color: Color(0xFFFF9864),
                 fontWeight: FontWeight.bold,
@@ -48,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, top: 8.0),
             child: Text(
-              "Coloque aqui somente as melhores",
+              "Aqui estão as receitas que você mais ama!",
               style: TextStyle(
                 color: Color(0xFF784E39),
                 fontSize: 16,
@@ -59,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
           (listaReceitas.isEmpty)
               ? const Center(
             child: Text(
-              "Nenhuma receita ainda.\nVamos criar a primeira?",
+              "Nenhuma receita favoritada ainda.\nExplore e adicione suas preferidas!",
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 18),
             ),
@@ -113,13 +112,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showFormModal();
-        },
-        backgroundColor: Color(0xFFFF9864),
-        child: Icon(Icons.add),
-      ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         onTap: (index) {
@@ -150,8 +142,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   showFormModal({Receita? model}) {
-    String title = "Adicionar Receita";
-    String confirmationButton = "Adicionar receita";
+    String title = "Editar Receita";
+    String confirmationButton = "Salvar alterações";
     String skipButton = "Cancelar";
 
     TextEditingController nameController = TextEditingController();
@@ -181,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
           child: ListView(
             children: [
               Text(
-                "Receita",
+                title,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Color(0xFFFF9864),
@@ -240,10 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   ElevatedButton(
                     onPressed: () {
-                      var id = const Uuid().v1();
-                      if (model != null) {
-                        id = model.id;
-                      }
+                      var id = model != null ? model.id : '';
                       receitaController.createOrUpdate(
                           nameController.text,
                           descriptionController.text,
@@ -275,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   refresh() async {
-    final receitas = await receitaController.getAll();
+    final receitas = await receitaController.getFavorites();
     setState(() {
       listaReceitas = receitas;
     });
