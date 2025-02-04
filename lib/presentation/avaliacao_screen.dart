@@ -239,7 +239,7 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
                 ),
                 decoration: const InputDecoration(
                   label: Text("Nota"),
-                  icon: Icon(Icons.attach_money_rounded),
+                  icon: Icon(Icons.star),
                   border: OutlineInputBorder(),
                 ),
               ),
