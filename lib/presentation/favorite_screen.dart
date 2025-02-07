@@ -7,7 +7,8 @@ import 'package:matc89_aplicativo_receitas/presentation/widgets/card_receita.dar
 import '../models/receita.dart';
 
 class FavoriteScreen extends StatefulWidget {
-  const FavoriteScreen({super.key});
+  final String nomeUsuario;
+  const FavoriteScreen({super.key, required this.nomeUsuario});
 
   @override
   State<FavoriteScreen> createState() => _FavoriteScreenState();
@@ -118,12 +119,12 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),
+              MaterialPageRoute(builder: (context) => HomeScreen(nomeUsuario: widget.nomeUsuario)),
             );
           } else if (index == 1) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => FavoriteScreen()),
+              MaterialPageRoute(builder: (context) => FavoriteScreen(nomeUsuario: widget.nomeUsuario,)),
             );
           }
         },

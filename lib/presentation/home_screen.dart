@@ -4,11 +4,13 @@ import 'package:matc89_aplicativo_receitas/controllers/receita_controller.dart';
 import 'package:matc89_aplicativo_receitas/presentation/avaliacao_screen.dart';
 import 'package:matc89_aplicativo_receitas/presentation/favorite_screen.dart';
 import 'package:matc89_aplicativo_receitas/presentation/widgets/card_receita.dart';
+import 'package:matc89_aplicativo_receitas/services/auth_service.dart';
 import 'package:uuid/uuid.dart';
 import '../models/receita.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String nomeUsuario;
+  const HomeScreen({super.key, required this.nomeUsuario});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -18,6 +20,7 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Receita> listaReceitas = [];
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   ReceitaController receitaController = ReceitaController();
+  AuthService authService = AuthService();
 
   @override
   void initState() {
@@ -41,6 +44,14 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.logout, color: Color(0xFFFF9864)),
+            onPressed: () {
+              authService.logout();
+            },
+          ),
+        ],
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Padding(
             padding: const EdgeInsets.only(left: 16.0, top: 8.0),
             child: Text(
-              "Coloque aqui somente as melhores",
+              "Olá, ${widget.nomeUsuario}, cadastre e aproveite as receitas!",
               style: TextStyle(
                 color: Color(0xFF784E39),
                 fontSize: 16,
@@ -126,12 +137,12 @@ class _HomeScreenState extends State<HomeScreen> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),
+              MaterialPageRoute(builder: (context) => HomeScreen(nomeUsuario: widget.nomeUsuario,)),
             );
           } else if (index == 1) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => FavoriteScreen()),
+              MaterialPageRoute(builder: (context) => FavoriteScreen(nomeUsuario: widget.nomeUsuario,)),
             );
           }
         },

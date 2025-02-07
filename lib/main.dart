@@ -2,6 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:matc89_aplicativo_receitas/presentation/home_screen.dart';
+import 'package:matc89_aplicativo_receitas/presentation/login_screen.dart';
+import 'package:matc89_aplicativo_receitas/presentation/widgets/auth_check.dart';
+import 'package:matc89_aplicativo_receitas/services/auth_service.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -9,7 +13,12 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform
   );
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(providers:  [
+      ChangeNotifierProvider(create: (context) => AuthService())
+    ],
+      child: MyApp()),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -23,7 +32,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const HomeScreen(),
+      home:  AuthCheck()
     );
   }
 }
