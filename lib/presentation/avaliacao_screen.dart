@@ -220,6 +220,7 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
                 TextFormField(
                   controller: commentController,
                   keyboardType: TextInputType.name,
+                  maxLength: 200,
                   textCapitalization: TextCapitalization.words,
                   decoration: const InputDecoration(
                     label: Text("Comentário"),
@@ -233,6 +234,9 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
                     if (value.length < 5) {
                       return 'O comentário deve ter pelo menos 5 caracteres';
                     }
+                    if (value.length > 200) {
+                      return 'O comentário deve ter menos de 200 caracteres';
+                    }
                     return null;
                   },
                 ),
@@ -244,7 +248,7 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
                     decimal: true,
                   ),
                   decoration: const InputDecoration(
-                    label: Text("Nota"),
+                    label: Text("Nota (0 à 5)"),
                     icon: Icon(Icons.star),
                     border: OutlineInputBorder(),
                   ),
