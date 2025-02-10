@@ -66,7 +66,7 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
                         color: Color(0xFF784E39),
                       ),
                       Text(
-                        "Avaliação: ${averageScore.toStringAsFixed(2)}/5",
+                        "Avaliação: ${averageScore.toStringAsFixed(averageScore.truncateToDouble() == averageScore ? 0 : 2)}/5",
                         style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -256,9 +256,9 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
                     if (value == null || value.isEmpty) {
                       return 'A nota não pode estar vazia';
                     }
-                    final score = double.tryParse(value);
-                    if (score == null || score < 0 || score > 5) {
-                      return 'Digite uma nota entre 0 e 5';
+                    final score = int.tryParse(value);
+                    if (score == null || score < 1 || score > 5) {
+                      return 'Digite uma nota entre 1 e 5 (somente números inteiros)';
                     }
                     return null;
                   },

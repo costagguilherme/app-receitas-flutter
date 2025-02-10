@@ -96,6 +96,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                             showFormModal(model: receita);
                           },
                           onFavorite: () {
+                            print("caiu aq");
                             receitaController.createOrUpdate(
                               receita.name,
                               receita.description,
@@ -143,8 +144,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   }
 
   showFormModal({Receita? model}) {
-    String title = "Editar Receita";
-    String confirmationButton = "Salvar alterações";
+    final formKey = GlobalKey<FormState>();
+    String confirmationButton = "Adicionar receita";
     String skipButton = "Cancelar";
 
     TextEditingController nameController = TextEditingController();
@@ -153,7 +154,6 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
     TextEditingController preparationController = TextEditingController();
 
     if (model != null) {
-      title = "Editando '${model.name}'";
       nameController.text = model.name;
       descriptionController.text = model.description;
       ingredientsController.text = model.ingredients;
@@ -171,92 +171,153 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
         return Container(
           height: MediaQuery.of(context).size.height * 0.8,
           padding: const EdgeInsets.all(32.0),
-          child: ListView(
-            children: [
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Color(0xFFFF9864),
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  label: Text("Título da receita"),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                controller: descriptionController,
-                decoration: const InputDecoration(
-                  label: Text("Descrição da receita"),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                controller: ingredientsController,
-                decoration: const InputDecoration(
-                  label: Text("Lista de ingredientes"),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextFormField(
-                keyboardType: TextInputType.multiline,
-                maxLines: null,
-                controller: preparationController,
-                decoration: const InputDecoration(
-                  label: Text("Modo de preparo"),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      skipButton,
-                      style: const TextStyle(color: Color(0xFF784E39)),
-                    ),
+          child: Form(
+            key: formKey,
+            child: ListView(
+              children: [
+                const Text(
+                  "Receita",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFFFF9864),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      var id = model != null ? model.id : '';
-                      receitaController.createOrUpdate(
-                          nameController.text,
-                          descriptionController.text,
-                          ingredientsController.text,
-                          preparationController.text,
-                          id,
-                          false);
-                      refresh();
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFFF9864),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 32, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: nameController,
+                  maxLength: 30,
+                  decoration: const InputDecoration(
+                    label: Text("Título da receita"),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Preencha o título da receita';
+                    }
+                    if (value.length < 4) {
+                      return 'O título deve ter no mínimo 5 caracteres';
+                    }
+                    if (value.length > 30) {
+                      return 'O título deve ter menos de 30 caracteres';
+                    }
+                    return null;
+
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: descriptionController,
+                  maxLength: 50,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Preencha a descrição da receita';
+                    }
+                    if (value.length < 10) {
+                      return 'A descrição deve ter no mínimo 10 caracteres';
+                    }
+                    if (value.length > 50) {
+                      return 'A descrição deve ter menos de 50 caracteres';
+                    }
+                    return null;
+
+                  },
+                  decoration: const InputDecoration(
+                    label: Text("Descrição da receita"),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  maxLength: 255,
+                  controller: ingredientsController,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Preencha a lista de ingredientes';
+                    }
+                    if (value.length < 15) {
+                      return 'A lista de ingredientes deve ter no mínimo 15 caracteres';
+                    }
+                    if (value.length > 255) {
+                      return 'A lista de ingredientes deve ter menos de 255 caracteres';
+                    }
+                    return null;
+
+                  },
+                  decoration: const InputDecoration(
+                    label: Text("Lista de ingredientes"),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  keyboardType: TextInputType.multiline,
+                  maxLines: null,
+                  maxLength: 450,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'Preencha o modo de preparo';
+                    }
+                    if (value.length < 20) {
+                      return 'O modo de preparo deve ter no mínimo 20 caracteres';
+                    }
+                    if (value.length > 450) {
+                      return 'O modo de preparo deve ter menos de 450 caracteres';
+                    }
+                    return null;
+
+                  },
+                  controller: preparationController,
+                  decoration: const InputDecoration(
+                    label: Text("Modo de preparo"),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        skipButton,
+                        style: const TextStyle(color: Color(0xFF784E39)),
                       ),
                     ),
-                    child: Text(confirmationButton),
-                  ),
-                ],
-              ),
-            ],
+                    ElevatedButton(
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          var id = model!.id;
+                          receitaController.createOrUpdate(
+                              nameController.text,
+                              descriptionController.text,
+                              ingredientsController.text,
+                              preparationController.text,
+                              id,
+                              model.favorite);
+                          refresh();
+                          Navigator.pop(context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF9864),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(confirmationButton),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },
