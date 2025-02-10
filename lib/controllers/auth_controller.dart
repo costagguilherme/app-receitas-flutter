@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:matc89_aplicativo_receitas/auth_service.dart';
@@ -9,12 +11,10 @@ class AuthController {
 
   Future<void> login(String email, String senha, BuildContext context) async {
     try {
-      UserCredential userCredential = await authService.login(email, senha);
-      if (userCredential != null) {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-      }
+      await authService.login(email, senha);
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const HomeScreen()));
     } on FirebaseAuthException catch (e) {
-      print(e.code);
       if (e.code == 'user-not-found') {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Usuário não encontrado'),
@@ -29,18 +29,16 @@ class AuthController {
     }
   }
 
-  Future<void> register(String email, String senha, BuildContext context) async {
+  Future<void> register(
+      String email, String senha, BuildContext context) async {
     try {
-      UserCredential userCredential = await authService.register(email, senha);
-      if (userCredential != null) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => AuthCheckScreen()),
-              (route) => false,
-        );
-      }
+      await authService.register(email, senha);
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const AuthCheckScreen()),
+        (route) => false,
+      );
     } on FirebaseAuthException catch (e) {
-      print(e.code);
       String errorMessage = "Erro ao criar conta";
       if (e.code == 'email-already-in-use') {
         errorMessage = 'Este e-mail já está em uso';
@@ -55,5 +53,4 @@ class AuthController {
       ));
     }
   }
-
 }

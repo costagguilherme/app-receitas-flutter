@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,31 +15,32 @@ class AuthCheckScreen extends StatefulWidget {
 }
 
 class _AuthCheckScreenState extends State<AuthCheckScreen> {
-
   StreamSubscription? streamSubscription;
 
   @override
   void initState() {
     super.initState();
-    streamSubscription = FirebaseAuth.instance
-      .authStateChanges()
-      .listen((User? user) {
-       if (user == null) {
-         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
-       } else {
-         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen()));
-       }
+    streamSubscription =
+        FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      if (user == null) {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()));
+      } else {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => const HomeScreen()));
+      }
     });
   }
 
-  @override void dispose() {
+  @override
+  void dispose() {
     streamSubscription!.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: CircularProgressIndicator(),
       ),

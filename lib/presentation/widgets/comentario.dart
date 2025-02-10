@@ -6,11 +6,11 @@ class Comentario extends StatelessWidget {
   final VoidCallback onLongPress;
 
   const Comentario({
-    Key? key,
+    super.key,
     required this.nota,
     required this.comentario,
     required this.onLongPress,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class Comentario extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: ListTile(
         onLongPress: onLongPress,
-        contentPadding: EdgeInsets.all(8.0),
+        contentPadding: const EdgeInsets.all(8.0),
         tileColor: const Color(0xFFFFF2EB),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),

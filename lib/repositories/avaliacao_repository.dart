@@ -3,7 +3,6 @@ import 'package:matc89_aplicativo_receitas/firestore_service.dart';
 import 'package:matc89_aplicativo_receitas/models/avaliacao.dart';
 
 class AvaliacaoRepository {
-
   FirebaseFirestore firestore = FirestoreService.instance;
 
   getAll(String recipeId) async {
@@ -21,8 +20,10 @@ class AvaliacaoRepository {
     return avaliacoes;
   }
 
-  createOrUpdate(String id, String recipeId, String comment, String score) async {
-    Avaliacao avaliacao = new Avaliacao(id: id, comment: comment, score: double.parse(score));
+  createOrUpdate(
+      String id, String recipeId, String comment, String score) async {
+    Avaliacao avaliacao =
+        Avaliacao(id: id, comment: comment, score: double.parse(score));
     firestore
         .collection("receitas")
         .doc(recipeId)
