@@ -5,7 +5,6 @@ import 'package:matc89_aplicativo_receitas/presentation/widgets/comentario.dart'
 import 'package:uuid/uuid.dart';
 import '../models/receita.dart';
 import '../models/avaliacao.dart';
-import '../presentation/widgets/list_tile_avaliacao.dart';
 
 class AvaliacaoScreen extends StatefulWidget {
   final Receita recipe;
@@ -18,7 +17,7 @@ class AvaliacaoScreen extends StatefulWidget {
 class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
   List<Avaliacao> listaAvaliacoes = [];
   FirebaseFirestore firestore = FirebaseFirestore.instance;
-  AvaliacaoController avaliacaoController = new AvaliacaoController();
+  AvaliacaoController avaliacaoController = AvaliacaoController();
 
   @override
   void initState() {
@@ -28,12 +27,12 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
 
   @override
   Widget build(BuildContext context) {
-    double averageScore = avaliacaoController.getAverageScore(this.listaAvaliacoes);
+    double averageScore = avaliacaoController.getAverageScore(listaAvaliacoes);
 
     return Scaffold(
-      appBar: AppBar(title: Text("Voltar")),
+      appBar: AppBar(title: const Text("Voltar")),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Color(0xFFFF9864),
+        backgroundColor: const Color(0xFFFF9864),
         onPressed: () {
           showFormModal();
         },
@@ -51,7 +50,7 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
                 children: [
                   Text(
                     widget.recipe.name,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Color(0xFFFF9864),
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -62,13 +61,13 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.star,
                         color: Color(0xFF784E39),
                       ),
                       Text(
                         "Avaliação: ${averageScore.toStringAsFixed(2)}/5",
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -79,8 +78,8 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                 "Comentários",
                 textAlign: TextAlign.left,
@@ -93,45 +92,46 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
             ),
             listaAvaliacoes.isEmpty
                 ? Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text(
-                "Ainda não há comentários sobre essa receita.",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
-              ),
-            )
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(
+                      "Ainda não há comentários sobre essa receita.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  )
                 : Column(
-              children: List.generate(listaAvaliacoes.length, (index) {
-                Avaliacao avaliacao = listaAvaliacoes[index];
-                return Dismissible(
-                  key: ValueKey<Avaliacao>(avaliacao),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    padding: EdgeInsets.only(right: 8.0),
-                    color: Colors.red,
-                    child: Icon(Icons.delete, color: Colors.white),
-                    alignment: Alignment.centerRight,
+                    children: List.generate(listaAvaliacoes.length, (index) {
+                      Avaliacao avaliacao = listaAvaliacoes[index];
+                      return Dismissible(
+                        key: ValueKey<Avaliacao>(avaliacao),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        onDismissed: (direction) {
+                          avaliacaoController.delete(
+                              avaliacao.id, widget.recipe.id);
+                          refresh();
+                        },
+                        child: Comentario(
+                          nota: avaliacao.score,
+                          comentario: avaliacao.comment,
+                          onLongPress: () {
+                            showFormModal(model: avaliacao);
+                          },
+                        ),
+                      );
+                    }),
                   ),
-                  onDismissed: (direction) {
-                    avaliacaoController.delete(avaliacao.id, widget.recipe.id);
-                    refresh();
-                  },
-                  child: Comentario(
-                    nota: avaliacao.score ?? 0.0,
-                    comentario: avaliacao.comment,
-                    onLongPress: () {
-                      showFormModal(model: avaliacao);
-                    },
-                  ),
-                );
-              }),
-            ),
             const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                 "Ingredientes",
                 textAlign: TextAlign.left,
@@ -151,8 +151,8 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16.0),
               child: Text(
                 "Modo de preparo",
                 textAlign: TextAlign.left,
@@ -178,22 +178,16 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
   }
 
   showFormModal({Avaliacao? model}) {
-    String labelTitle = "Adicionar avaliação";
+    final formKey = GlobalKey<FormState>();
     String labelConfirmationButton = "Salvar";
     String labelSkipButton = "Cancelar";
 
     TextEditingController commentController = TextEditingController();
     TextEditingController scoreController = TextEditingController();
 
-    bool isComprado = false;
-
     if (model != null) {
-      labelTitle = "Editando comentário";
       commentController.text = model.comment;
-
-      if (model.score != null) {
-        scoreController.text = model.score.toString();
-      }
+      scoreController.text = model.score.toString();
     }
 
     showModalBottomSheet(
@@ -208,79 +202,112 @@ class _AvaliacaoScreenState extends State<AvaliacaoScreen> {
         return Container(
           height: MediaQuery.of(context).size.height * 0.85,
           padding: const EdgeInsets.all(32.0),
-          child: ListView(
-            children: [
-              Text(
-                "Avaliação",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Color(0xFFFF9864),
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextFormField(
-                controller: commentController,
-                keyboardType: TextInputType.name,
-                textCapitalization: TextCapitalization.words,
-                decoration: const InputDecoration(
-                  label: Text("Comentário"),
-                  icon: Icon(Icons.abc_rounded),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: scoreController,
-                keyboardType: const TextInputType.numberWithOptions(
-                  signed: false,
-                  decimal: true,
-                ),
-                decoration: const InputDecoration(
-                  label: Text("Nota"),
-                  icon: Icon(Icons.star),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text(
-                      labelSkipButton,
-                      style: TextStyle(color: Color(0xFF784E39)),
-                    ),
+          child: Form(
+            // Envolvendo o ListView com Form
+            key: formKey,
+            child: ListView(
+              children: [
+                const Text(
+                  "Avaliação",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFFFF9864),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
                   ),
-                  const SizedBox(width: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      var id = const Uuid().v1();
-                      if (model != null) {
-                        id = model.id;
-                      }
-
-                      avaliacaoController.createOrUpdate(
-                          id, widget.recipe.id, commentController.text, scoreController.text);
-                      refresh();
-                      Navigator.pop(context);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFF9864),
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                ),
+                const SizedBox(height: 20),
+                TextFormField(
+                  controller: commentController,
+                  keyboardType: TextInputType.name,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(
+                    label: Text("Comentário"),
+                    icon: Icon(Icons.abc_rounded),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return 'O comentário não pode estar vazio';
+                    }
+                    if (value.length < 5) {
+                      return 'O comentário deve ter pelo menos 5 caracteres';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: scoreController,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    signed: false,
+                    decimal: true,
+                  ),
+                  decoration: const InputDecoration(
+                    label: Text("Nota"),
+                    icon: Icon(Icons.star),
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'A nota não pode estar vazia';
+                    }
+                    final score = double.tryParse(value);
+                    if (score == null || score < 0 || score > 5) {
+                      return 'Digite uma nota entre 0 e 5';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(
+                        labelSkipButton,
+                        style: const TextStyle(color: Color(0xFF784E39)),
                       ),
                     ),
-                    child: Text(labelConfirmationButton),
-                  ),
-                ],
-              ),
-            ],
+                    const SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (formKey.currentState!.validate()) {
+                          // Validação antes de enviar
+                          var id = const Uuid().v1();
+                          if (model != null) {
+                            id = model.id;
+                          }
+
+                          avaliacaoController.createOrUpdate(
+                            id,
+                            widget.recipe.id,
+                            commentController.text,
+                            scoreController.text,
+                          );
+                          refresh();
+                          Navigator.pop(context);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFF9864),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 32,
+                          vertical: 12,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: Text(labelConfirmationButton),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },

@@ -28,7 +28,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
+        title: const Row(
           children: [
             Text(
               "Receitas Favoritas",
@@ -44,8 +44,8 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 8.0),
+          const Padding(
+            padding: EdgeInsets.only(left: 16.0, top: 8.0),
             child: Text(
               "Aqui estão as receitas que você mais ama!",
               style: TextStyle(
@@ -57,59 +57,60 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           const SizedBox(height: 20),
           (listaReceitas.isEmpty)
               ? const Center(
-            child: Text(
-              "Nenhuma receita favoritada ainda.\nExplore e adicione suas preferidas!",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 18),
-            ),
-          )
-              : Expanded(
-            child: ListView.builder(
-              itemCount: listaReceitas.length,
-              itemBuilder: (context, index) {
-                final receita = listaReceitas[index];
-                return Dismissible(
-                  key: ValueKey<Receita>(receita),
-                  direction: DismissDirection.endToStart,
-                  background: Container(
-                    padding: EdgeInsets.only(right: 8.0),
-                    color: Colors.red,
-                    child: Icon(Icons.delete, color: Colors.white),
-                    alignment: Alignment.centerRight,
+                  child: Text(
+                    "Nenhuma receita favoritada ainda.\nExplore e adicione suas preferidas!",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 18),
                   ),
-                  onDismissed: (direction) {
-                    receitaController.delete(receita.id);
-                    refresh();
-                  },
-                  child: CardReceita(
-                    receita: receita,
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AvaliacaoScreen(recipe: receita),
+                )
+              : Expanded(
+                  child: ListView.builder(
+                    itemCount: listaReceitas.length,
+                    itemBuilder: (context, index) {
+                      final receita = listaReceitas[index];
+                      return Dismissible(
+                        key: ValueKey<Receita>(receita),
+                        direction: DismissDirection.endToStart,
+                        background: Container(
+                          padding: const EdgeInsets.only(right: 8.0),
+                          color: Colors.red,
+                          alignment: Alignment.centerRight,
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        onDismissed: (direction) {
+                          receitaController.delete(receita.id);
+                          refresh();
+                        },
+                        child: CardReceita(
+                          receita: receita,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    AvaliacaoScreen(recipe: receita),
+                              ),
+                            );
+                          },
+                          onLongPress: () {
+                            showFormModal(model: receita);
+                          },
+                          onFavorite: () {
+                            receitaController.createOrUpdate(
+                              receita.name,
+                              receita.description,
+                              receita.ingredients,
+                              receita.preparation,
+                              receita.id,
+                              receita.favorite == true ? false : true,
+                            );
+                            refresh();
+                          },
                         ),
                       );
                     },
-                    onLongPress: () {
-                      showFormModal(model: receita);
-                    },
-                    onFavorite: () {
-                      receitaController.createOrUpdate(
-                        receita.name,
-                        receita.description,
-                        receita.ingredients,
-                        receita.preparation,
-                        receita.id,
-                        receita.favorite == true ? false : true,
-                      );
-                      refresh();
-                    },
                   ),
-                );
-              },
-            ),
-          ),
+                ),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -118,12 +119,12 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
             );
           } else if (index == 1) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => FavoriteScreen()),
+              MaterialPageRoute(builder: (context) => const FavoriteScreen()),
             );
           }
         },
@@ -175,7 +176,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
               Text(
                 title,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Color(0xFFFF9864),
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -227,7 +228,7 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                     },
                     child: Text(
                       skipButton,
-                      style: TextStyle(color: Color(0xFF784E39)),
+                      style: const TextStyle(color: Color(0xFF784E39)),
                     ),
                   ),
                   ElevatedButton(
@@ -239,13 +240,12 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                           ingredientsController.text,
                           preparationController.text,
                           id,
-                          false
-                      );
+                          false);
                       refresh();
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFF9864),
+                      backgroundColor: const Color(0xFFFF9864),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 32, vertical: 12),
                       shape: RoundedRectangleBorder(

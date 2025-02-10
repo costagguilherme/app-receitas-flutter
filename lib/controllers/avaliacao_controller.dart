@@ -10,7 +10,8 @@ class AvaliacaoController {
     return await avaliacaoRepository.getAll(recipeId);
   }
 
-  Future<void> createOrUpdate(String id, String recipeId, String comment, String score) async {
+  Future<void> createOrUpdate(
+      String id, String recipeId, String comment, String score) async {
     await avaliacaoRepository.createOrUpdate(id, recipeId, comment, score);
   }
 
@@ -25,7 +26,7 @@ class AvaliacaoController {
     }
 
     double averageScore = 0;
-    if (avaliacoes.length > 0) {
+    if (avaliacoes.isNotEmpty) {
       averageScore = soma / avaliacoes.length;
     }
     return averageScore;

@@ -8,12 +8,12 @@ class CardReceita extends StatelessWidget {
   final VoidCallback onFavorite;
 
   const CardReceita({
-    Key? key,
+    super.key,
     required this.receita,
     required this.onTap,
     required this.onLongPress,
     required this.onFavorite,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +44,9 @@ class CardReceita extends StatelessWidget {
             // const Icon(Icons.open_with, color: Colors.grey),
             IconButton(
               icon: Icon(
-                receita.favorite == true ? Icons.favorite : Icons.favorite_border,
+                receita.favorite == true
+                    ? Icons.favorite
+                    : Icons.favorite_border,
                 color: receita.favorite ? Colors.red : Colors.grey,
               ),
               onPressed: onFavorite,
@@ -55,5 +57,3 @@ class CardReceita extends StatelessWidget {
     );
   }
 }
-
-

@@ -30,12 +30,11 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
+        title: const Row(
           children: [
             Text(
               "Livro de Receitas.",
@@ -49,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.exit_to_app, color: Color(0xFFFF9864)),
+            icon: const Icon(Icons.exit_to_app, color: Color(0xFFFF9864)),
             onPressed: () {
               logout();
             },
@@ -59,8 +58,8 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 8.0),
+          const Padding(
+            padding: EdgeInsets.only(left: 16.0, top: 8.0),
             child: Text(
               "Coloque aqui somente as melhores",
               style: TextStyle(
@@ -87,10 +86,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         key: ValueKey<Receita>(receita),
                         direction: DismissDirection.endToStart,
                         background: Container(
-                          padding: EdgeInsets.only(right: 8.0),
+                          padding: const EdgeInsets.only(right: 8.0),
                           color: Colors.red,
-                          child: Icon(Icons.delete, color: Colors.white),
                           alignment: Alignment.centerRight,
+                          child: const Icon(Icons.delete, color: Colors.white),
                         ),
                         onDismissed: (direction) {
                           receitaController.delete(receita.id);
@@ -132,8 +131,8 @@ class _HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           showFormModal();
         },
-        backgroundColor: Color(0xFFFF9864),
-        child: Icon(Icons.add),
+        backgroundColor: const Color(0xFFFF9864),
+        child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
@@ -141,12 +140,12 @@ class _HomeScreenState extends State<HomeScreen> {
           if (index == 0) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => HomeScreen()),
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
             );
           } else if (index == 1) {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => FavoriteScreen()),
+              MaterialPageRoute(builder: (context) => const FavoriteScreen()),
             );
           }
         },
@@ -165,7 +164,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   showFormModal({Receita? model}) {
-    String title = "Adicionar Receita";
     String confirmationButton = "Adicionar receita";
     String skipButton = "Cancelar";
 
@@ -175,7 +173,6 @@ class _HomeScreenState extends State<HomeScreen> {
     TextEditingController preparationController = TextEditingController();
 
     if (model != null) {
-      title = "Editando '${model.name}'";
       nameController.text = model.name;
       descriptionController.text = model.description;
       ingredientsController.text = model.ingredients;
@@ -195,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.all(32.0),
           child: ListView(
             children: [
-              Text(
+              const Text(
                 "Receita",
                 textAlign: TextAlign.center,
                 style: TextStyle(
@@ -250,7 +247,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     child: Text(
                       skipButton,
-                      style: TextStyle(color: Color(0xFF784E39)),
+                      style: const TextStyle(color: Color(0xFF784E39)),
                     ),
                   ),
                   ElevatedButton(
@@ -270,7 +267,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFFF9864),
+                      backgroundColor: const Color(0xFFFF9864),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 32, vertical: 12),
                       shape: RoundedRectangleBorder(
@@ -289,9 +286,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   logout() async {
-    await authService.logout().then((user) =>
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => AuthCheckScreen()))
-    );
+    await authService.logout().then((user) => Navigator.pushReplacement(context,
+        MaterialPageRoute(builder: (context) => const AuthCheckScreen())));
   }
 
   refresh() async {
