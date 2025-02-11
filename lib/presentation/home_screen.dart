@@ -322,7 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ingredientsController.text,
                               preparationController.text,
                               id,
-                              false);
+                              model != null ? model.favorite : false);
                           refresh();
                           Navigator.pop(context);
                         }
