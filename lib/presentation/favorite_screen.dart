@@ -96,7 +96,6 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
                             showFormModal(model: receita);
                           },
                           onFavorite: () {
-                            print("caiu aq");
                             receitaController.createOrUpdate(
                               receita.name,
                               receita.description,
